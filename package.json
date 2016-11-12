@@ -1,0 +1,20 @@
+{
+  "name": "gitlab-merge-request-resource",
+  "version": "1.0.0",
+  "description": "A Concourse CI resource for Gitlab merge requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.swisscloud.io/tobias.fuhrimann/gitlab-resource.git"
+  },
+  "author": "Tobias Fuhrimann, Mathis Kretz",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.16.6",
+    "node-gitlab": "^1.4.0"
+  }
+}
