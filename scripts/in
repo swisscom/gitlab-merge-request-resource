@@ -13,16 +13,16 @@ if [ -z "$destination" ]; then
   exit 1
 fi
 
-payload=$(mktemp $TMPDIR/gitlab-merge-request-resource.XXXXXX)
+payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
 
-cat > $payload <&0
+cat > "${payload}" <&0
 
-gitlab_host=$(jq -r '.source.gitlab_host // ""' < ${payload})
-username=$(jq -r '.source.username // ""' < ${payload})
-password=$(jq -r '.source.password // ""' < ${payload})
-project_path=$(jq -r '.source.project_path // ""' < ${payload})
-source_branch=$(jq -r '.version.source_branch // ""' < ${payload})
+gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
+username=$(jq -r '.source.username // ""' < "${payload}")
+password=$(jq -r '.source.password // ""' < "${payload}")
+project_path=$(jq -r '.source.project_path // ""' < "${payload}")
+source_branch=$(jq -r '.version.source_branch // ""' < "${payload}")
 
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
-git clone --single-branch $uri --branch $source_branch $destination
+git clone --single-branch "${uri}" --branch "${source_branch}" "${destination}"
