@@ -5,23 +5,30 @@ A concourse resource to check for new merge requests on GitLab
 ## Usage
 
 ```yaml
+resource_types:
+- name: merge-request
+  type: docker-image
+  source:
+    repository: jtarchie/pr
+
 resources:
-- name: gitlab-mr
-  type: gitlab-merge-request
+- name: my-repo-mr
+  type: merge-request
   source:
     gitlab_host: gitlab.swisscloud.io
-    project_path: 123
+    project_id: 123
+    project_path: myname/myproject
     private_key: XXX
+    username: my_username
+    password: xxx
 ```
 
 * `gitlab_host` is the host of your GitLab server (without the `https://`)
 * `project_path` is the ID or path of your project
 * `private_key` is your GitLab user's private key (can be found in your profile)
+* `username` is the username for HTTP(S) auth when pulling
+* `password` is the password for HTTP(S) auth when pulling
 
 ## Build Docker Image
 
 1. Run `docker build -t gitlab-merge-request-resource .`
-
-## Test locally
-
-1. Run `docker run -it --rm gitlab-merge-request-resource /opt/resource/check '{"source":{"gitlab_host":"gitlab.swisscloud.io","project_path":1461,"private_token":"XXX"},"version":{"source_branch":"feature/1","updated_at":"2016-11-02T10:22:08.000Z"}}'`

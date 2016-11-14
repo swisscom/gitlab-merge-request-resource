@@ -6,4 +6,8 @@ set -e
 exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
-node "${BASH_SOURCE%/*}/check.js" "$1"
+payload=$(mktemp $TMPDIR/gitlab-merge-request-resource.XXXXXX)
+
+cat > $payload <&0
+
+node "${BASH_SOURCE%/*}/check.js" >&3 < "${payload}"

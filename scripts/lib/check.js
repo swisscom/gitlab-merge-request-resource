@@ -3,20 +3,6 @@
 const gitlab = require('node-gitlab');
 
 /**
- * getProject retrieves a gitlab project
- *
- * @param {Object} client A valid GitLab client
- * @param {string} projectPath The path of the project to retrieve
- * (currently only the project ID is working)
- * @returns {Promise} The project
- */
-function getProject(client, projectPath) {
-  const project = client.projects.get({ id: projectPath });
-
-  return project;
-}
-
-/**
  * getOpenMergeRequests retrieves all open merge requests of a GitLab project
  *
  * @param {Object} client A valid GitLab client
@@ -96,10 +82,7 @@ function check(payload) {
     privateToken: payload.source.private_token,
   });
 
-  return getProject(client, payload.source.project_path)
-    .then((project) =>
-      getOpenMergeRequests(client, project.id)
-    )
+  return getOpenMergeRequests(client, payload.source.project_id)
     .then((openMergeRequests) =>
       getNewMergeRequest(openMergeRequests, payload.version)
     )
