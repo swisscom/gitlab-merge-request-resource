@@ -21,8 +21,11 @@ gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
 username=$(jq -r '.source.username // ""' < "${payload}")
 password=$(jq -r '.source.password // ""' < "${payload}")
 project_path=$(jq -r '.source.project_path // ""' < "${payload}")
+version=$(jq -r '.version // ""' < "${payload}")
 source_branch=$(jq -r '.version.source_branch // ""' < "${payload}")
 
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
 git clone --single-branch "${uri}" --branch "${source_branch}" "${destination}"
+
+echo "{ \"version\": ${version} }"
