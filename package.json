@@ -1,11 +1,10 @@
 {
   "name": "gitlab-merge-request-resource",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Concourse CI resource for Gitlab merge requests",
-  "main": "index.js",
   "scripts": {
-    "test": "test",
-    "start": "node index.js"
+    "test": "eslint lib --fix",
+    "start": "scripts/check '{\"source\":{\"gitlab_host\":\"gitlab.swisscloud.io\",\"project_path\":1461,\"private_token\":\"XXX\"},\"version\":{\"source_branch\":\"feature/1\",\"updated_at\":\"2016-11-02T10:22:08.000Z\"}}'"
   },
   "repository": {
     "type": "git",
@@ -14,7 +13,11 @@
   "author": "Tobias Fuhrimann, Mathis Kretz",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.16.6",
     "node-gitlab": "^1.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.10.0",
+    "eslint-config-mastertinner-nodejs": "^11.2.0",
+    "eslint-plugin-mocha": "^4.7.0"
   }
 }
