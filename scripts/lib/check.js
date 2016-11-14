@@ -41,6 +41,7 @@ function getOpenMergeRequests(client, projectId) {
  * @returns {Array} All new merge requests
  */
 function getNewMergeRequest(mergeRequestList, version) {
+  const newVersions = [];
   const updDateVersion = new Date(version.updated_at);
 
   mergeRequestList.sort((a, b) => {
@@ -54,11 +55,17 @@ function getNewMergeRequest(mergeRequestList, version) {
     const updDateMr = new Date(mergeRequestList[i].updated_at);
 
     if (updDateMr > updDateVersion) {
-      return createVersion(mergeRequestList[i]);
+      newVersions.push(createVersion(mergeRequestList[i]));
     }
   }
 
-  return {};
+  // If the given version is already the latest,
+  // an array with that version as the sole entry should be listed.
+  if (newVersions.length === 0) {
+    newVersions.push(version);
+  }
+
+  return newVersions;
 }
 
 /**
