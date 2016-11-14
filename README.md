@@ -9,7 +9,7 @@ resource_types:
 - name: merge-request
   type: docker-image
   source:
-    repository: jtarchie/pr
+    repository: mastertinner/gitlab-merge-request-resource
 
 resources:
 - name: my-repo-mr
