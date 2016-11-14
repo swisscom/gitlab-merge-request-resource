@@ -29,6 +29,10 @@ resources:
 * `username` is the username for HTTP(S) auth when pulling
 * `password` is the password for HTTP(S) auth when pulling
 
+## Find Docker Image
+
+Check <https://store.docker.com/community/images/mastertinner/gitlab-merge-request-resource>
+
 ## Build Docker Image
 
 1. Run `docker build -t gitlab-merge-request-resource .`
