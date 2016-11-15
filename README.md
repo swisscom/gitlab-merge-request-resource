@@ -18,14 +18,14 @@ resources:
     gitlab_host: gitlab.swisscloud.io
     project_id: 123
     project_path: myname/myproject
-    private_key: XXX
+    private_token: XXX
     username: my_username
     password: xxx
 ```
 
 * `gitlab_host` is the host of your GitLab server (without the `https://`)
 * `project_path` is the ID or path of your project
-* `private_key` is your GitLab user's private key (can be found in your profile)
+* `private_token` is your GitLab user's private token (can be found in your profile)
 * `username` is the username for HTTP(S) auth when pulling
 * `password` is the password for HTTP(S) auth when pulling
 
