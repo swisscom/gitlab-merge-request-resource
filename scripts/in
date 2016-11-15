@@ -26,16 +26,18 @@ source_branch=$(jq -r '.version.source_branch // ""' < "${payload}")
 
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
-branch_flag=""
 if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z"}'
-else
+fi
+
+branch_flag=""
+if ! [ -z "${source_branch}" ]; then
   branch_flag="--branch ${source_branch}"
 fi
 
 git clone --single-branch "${uri}" ${branch_flag} "${destination}"
 
 jq -n "{
-  version: $(echo ${version}),
+  version: ${version},
   metadata: null
 }" >&3

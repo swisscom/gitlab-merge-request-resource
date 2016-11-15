@@ -24,6 +24,6 @@ if [ -z "${version}" ]; then
 fi
 
 jq -n "{
-  version: $(echo ${version}),
+  version: ${version},
   metadata: null
 }" >&3
