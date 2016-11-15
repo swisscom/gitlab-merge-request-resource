@@ -27,6 +27,10 @@ function getOpenMergeRequests(client, projectId) {
  * @returns {Array} All new merge requests
  */
 function getNewMergeRequests(mergeRequestList, version) {
+  if (version === null) {
+    return [{ updated_at: '1800-01-01T00:00:00.000Z' }];
+  }
+
   const newVersions = [];
   const updDateVersion = new Date(version.updated_at);
 
