@@ -10,4 +10,44 @@ payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
 
 cat > "${payload}" <&0
 
-node "${BASH_SOURCE%/*}/check.js" "$(cat ${payload})"
+private_token=$(jq -r '.source.private_token // ""' < "${payload}")
+gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
+project_id=$(jq -r '.source.project_id // ""' < "${payload}")
+version=$(jq -r '.version // ""' < "${payload}")
+version_updated_at=$(jq -r '.version.updated_at // ""' < "${payload}")
+
+if [ -z "${version}" ]; then
+  version='{"updated_at":"1800-01-01T00:00:00.000Z"}'
+fi
+
+open_mrs=$(curl \
+--header "PRIVATE-TOKEN: ${private_token}" \
+"https://${gitlab_host}/api/v3/projects/${project_id}/merge_requests?state=opened")
+
+num_mrs="$(echo "${open_mrs}" | jq 'length')"
+
+function to_seconds {
+  date -d "$(echo "$1" | sed 's/.\{5\}$//' | tr T ' ')" +%s
+}
+
+new_versions=''
+
+for i in $(seq 0 $((num_mrs - 1))); do
+  mr="$(echo "${open_mrs}" | jq -r '.['"$i"']')"
+  mr_updated_at="$(echo "${mr}" | jq -r '.updated_at')"
+
+  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ]; then
+      mr_source_branch="$(echo "${mr}" | jq -r '.source_branch')"
+
+      new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"source_branch\":\"${mr_source_branch}\"}"
+  fi
+done
+
+new_versions=${new_versions#','}
+new_versions="[${new_versions}]"
+
+if [ "${new_versions}" == '[]' ]; then
+  new_versions="[${version}]"
+fi
+
+jq -n "${new_versions}" >&3

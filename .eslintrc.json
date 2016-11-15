@@ -1,6 +1,0 @@
-{
-  "extends": "mastertinner-nodejs",
-  "rules": {
-    "no-console": "off"
-  }
-}

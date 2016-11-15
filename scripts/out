@@ -23,4 +23,7 @@ if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z"}'
 fi
 
-echo "{\"version\":${version}}"
+jq -n "{
+  version: $(echo ${version}),
+  metadata: null
+}" >&3
