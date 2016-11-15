@@ -20,13 +20,13 @@ function getOpenMergeRequests(client, projectId) {
 }
 
 /**
- * getNewMergeRequest identifies a new merge requests out of a list
+ * getNewMergeRequests identifies a new merge requests out of a list
  *
  * @param {Array} mergeRequestList The total list of merge requests
  * @param {Object} version The old version coming from Concourse
  * @returns {Array} All new merge requests
  */
-function getNewMergeRequest(mergeRequestList, version) {
+function getNewMergeRequests(mergeRequestList, version) {
   const newVersions = [];
   const updDateVersion = new Date(version.updated_at);
 
@@ -84,7 +84,7 @@ function check(payload) {
 
   return getOpenMergeRequests(client, payload.source.project_id)
     .then((openMergeRequests) =>
-      getNewMergeRequest(openMergeRequests, payload.version)
+      getNewMergeRequests(openMergeRequests, payload.version)
     )
     .catch((err) => console.error(err));
 }
