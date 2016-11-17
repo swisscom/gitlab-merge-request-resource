@@ -6,6 +6,8 @@ set -e
 exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
+source "$(dirname "$0")/common.sh"
+
 destination=$1
 
 if [ -z "$destination" ]; then
@@ -39,5 +41,5 @@ git clone --single-branch "${uri}" ${branch_flag} "${destination}"
 
 jq -n "{
   version: ${version},
-  metadata: null
+  metadata: $(git_metadata)
 }" >&3
