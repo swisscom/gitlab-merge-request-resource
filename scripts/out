@@ -25,6 +25,8 @@ if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z"}'
 fi
 
+cd "${destination}"
+
 jq -n "{
   version: ${version},
   metadata: $(git_metadata)
