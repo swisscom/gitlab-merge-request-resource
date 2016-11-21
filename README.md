@@ -1,6 +1,8 @@
 # Gitlab Merge Reuqest Concourse Resource
 
-A concourse resource to check for new merge requests on GitLab
+A concourse resource to check for new merge requests on GitLab.
+
+Tested with Gitlab [6.8](https://github.com/gitlabhq/gitlabhq/tree/6-8-stable) only.
 
 ## Usage
 
