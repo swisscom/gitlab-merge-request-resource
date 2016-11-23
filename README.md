@@ -1,8 +1,8 @@
-# Gitlab Merge Reuqest Concourse Resource
+# GitLab Merge Reuqest Concourse Resource
 
 A concourse resource to check for new merge requests on GitLab.
 
-Tested with Gitlab [6.8](https://github.com/gitlabhq/gitlabhq/tree/6-8-stable) only.
+Tested with [GitLab 6.8](https://github.com/gitlabhq/gitlabhq/tree/6-8-stable) only.
 
 ## Usage
 
@@ -26,7 +26,8 @@ resources:
 ```
 
 * `gitlab_host` is the host of your GitLab server (without the `https://`)
-* `project_path` is the ID or path of your project
+* `project_id` is the ID of your project
+* `project_path` is the path of your project
 * `private_token` is your GitLab user's private token (can be found in your profile)
 * `username` is the username for HTTP(S) auth when pulling
 * `password` is the password for HTTP(S) auth when pulling
