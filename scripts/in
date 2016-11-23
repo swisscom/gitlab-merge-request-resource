@@ -47,7 +47,7 @@ fi
 
 git clone --single-branch "${uri}" ${branch_flag} "${destination}"
 
-echo "$ref" > "${destination}/merge_request_id"
+echo "$ref" > "${destination}/merge-request-id"
 
 cd "${destination}"
 
