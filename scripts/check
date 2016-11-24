@@ -39,7 +39,7 @@ for i in $(seq 0 $((num_mrs - 1))); do
   if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ]; then
       mr_id="$(echo "${mr}" | jq -r '.id')"
 
-      new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"ref\":\"${mr_id}\"}"
+      new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"mr_id\":\"${mr_id}\"}"
   fi
 done
 

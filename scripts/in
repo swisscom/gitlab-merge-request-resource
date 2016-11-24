@@ -26,11 +26,11 @@ project_path=$(jq -r '.source.project_path // ""' < "${payload}")
 username=$(jq -r '.source.username // ""' < "${payload}")
 password=$(jq -r '.source.password // ""' < "${payload}")
 version=$(jq -r '.version // ""' < "${payload}")
-ref=$(jq -r '.version.ref // ""' < "${payload}")
+mr_id=$(jq -r '.version.mr_id // ""' < "${payload}")
 
 merge_request=$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_id}/merge_request/${ref}")
+"https://${gitlab_host}/api/v3/projects/${project_id}/merge_request/${mr_id}")
 
 source_branch="$(echo ${merge_request} | jq -r '.source_branch // ""')"
 
@@ -47,7 +47,7 @@ fi
 
 git clone --single-branch "${uri}" ${branch_flag} "${destination}"
 
-echo "$ref" > "${destination}/merge-request-id"
+echo "${mr_id}" > "${destination}/merge-request-id"
 
 cd "${destination}"
 
