@@ -2,8 +2,6 @@
 
 A concourse resource to check for new merge requests on GitLab.
 
-Tested with [GitLab 6.8](https://github.com/gitlabhq/gitlabhq/tree/6-8-stable) only.
-
 ## Usage
 
 ```yaml
@@ -18,7 +16,6 @@ resources:
   type: merge-request
   source:
     gitlab_host: gitlab.swisscloud.io
-    project_id: 123
     project_path: myname/myproject
     private_token: XXX
     username: my_username
@@ -26,7 +23,6 @@ resources:
 ```
 
 * `gitlab_host` is the host of your GitLab server (without the `https://`)
-* `project_id` is the ID of your project
 * `project_path` is the path of your project
 * `private_token` is your GitLab user's private token (can be found in your profile)
 * `username` is the username for HTTP(S) auth when pulling
