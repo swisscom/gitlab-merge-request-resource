@@ -45,8 +45,8 @@ for i in $(seq 0 $((num_mrs - 1))); do
   fi
 done
 
-new_versions=${new_versions#','}
-new_versions="[${new_versions}]"
+new_versions=${new_versions#','} # remove trailing comma
+new_versions="[${new_versions}]" # make JSON array
 
 if [ "${new_versions}" == '[]' ]; then
   new_versions="[${version}]"
