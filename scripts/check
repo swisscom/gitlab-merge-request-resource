@@ -38,7 +38,7 @@ new_versions=''
 for i in $(seq 0 $((num_mrs - 1))); do
   mr="$(echo "${open_mrs}" | jq -r '.['"$i"']')"
   mr_updated_at="$(echo "${mr}" | jq -r '.updated_at')"
-  mr_sha="$(echo "${mr}" | jq -r '.')"
+  mr_sha="$(echo "${mr}" | jq -r '.sha')"
 
   if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ] && [ "${mr_sha}" -ne "${version_sha}" ]; then
       mr_id="$(echo "${mr}" | jq -r '.id')"
