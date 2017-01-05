@@ -27,11 +27,11 @@ password=$(jq -r '.source.password // ""' < "${payload}")
 version=$(jq -r '.version // ""' < "${payload}")
 mr_id=$(jq -r '.version.mr_id // ""' < "${payload}")
 
-project_path="${project_path//'/'/'%2F'}" # url encode "/"
+project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 merge_request=$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path}/merge_requests/${mr_id}")
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests/${mr_id}")
 
 source_branch="$(echo ${merge_request} | jq -r '.source_branch // ""')"
 

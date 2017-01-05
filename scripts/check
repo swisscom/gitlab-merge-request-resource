@@ -17,7 +17,7 @@ version=$(jq -r '.version // ""' < "${payload}")
 version_updated_at=$(jq -r '.version.updated_at // ""' < "${payload}")
 version_sha=$(jq -r '.version.sha // ""' < "${payload}")
 
-project_path="${project_path//'/'/'%2F'}" # url encode "/"
+project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
@@ -25,7 +25,7 @@ fi
 
 open_mrs=$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path}/merge_requests?state=opened")
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened")
 
 num_mrs="$(echo "${open_mrs}" | jq 'length')"
 
