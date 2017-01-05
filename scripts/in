@@ -38,7 +38,7 @@ source_branch="$(echo ${merge_request} | jq -r '.source_branch // ""')"
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
 if [ -z "${version}" ]; then
-  version='{"updated_at":"1800-01-01T00:00:00.000Z"}'
+  version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
 fi
 
 branch_flag=""

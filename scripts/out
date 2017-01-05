@@ -22,7 +22,7 @@ cat > "${payload}" <&0
 version=$(jq -r '.version // ""' < "${payload}")
 
 if [ -z "${version}" ]; then
-  version='{"updated_at":"1800-01-01T00:00:00.000Z"}'
+  version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
 fi
 
 cd "${destination}"
