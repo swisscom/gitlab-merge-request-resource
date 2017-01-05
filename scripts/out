@@ -19,13 +19,25 @@ payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
 
 cat > "${payload}" <&0
 
+gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
+private_token=$(jq -r '.source.private_token // ""' < "${payload}")
+project_path=$(jq -r '.source.project_path // ""' < "${payload}")
 version=$(jq -r '.version // ""' < "${payload}")
+version_sha=$(echo "${version}" | jq -r '.sha // ""')
+params_status=$(jq -r '.params.status // ""' < "${payload}")
+
+project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
 fi
 
 cd "${destination}"
+
+curl \
+--request POST
+--header "PRIVATE-TOKEN: ${private_token}" \
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${version_sha}?state=${params_status}"
 
 jq -n "{
   version: ${version},
