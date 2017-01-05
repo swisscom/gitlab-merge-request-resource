@@ -35,7 +35,7 @@ fi
 cd "${destination}"
 
 curl \
---request POST
+--request POST \
 --header "PRIVATE-TOKEN: ${private_token}" \
 "https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${version_sha}?state=${params_status}"
 
