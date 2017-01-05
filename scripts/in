@@ -25,7 +25,7 @@ project_path=$(jq -r '.source.project_path // ""' < "${payload}")
 username=$(jq -r '.source.username // ""' < "${payload}")
 password=$(jq -r '.source.password // ""' < "${payload}")
 version=$(jq -r '.version // ""' < "${payload}")
-mr_id=$(jq -r '.version.mr_id // ""' < "${payload}")
+mr_id=$(echo "${version}" | jq -r '.mr_id // ""')
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 

@@ -14,14 +14,15 @@ gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
 private_token=$(jq -r '.source.private_token // ""' < "${payload}")
 project_path=$(jq -r '.source.project_path // ""' < "${payload}")
 version=$(jq -r '.version // ""' < "${payload}")
-version_updated_at=$(jq -r '.version.updated_at // ""' < "${payload}")
-version_sha=$(jq -r '.version.sha // ""' < "${payload}")
-
-project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
 fi
+
+version_updated_at=$(echo "${version}" | jq -r '.updated_at // ""')
+version_sha=$(echo "${version}" | jq -r '.sha // ""')
+
+project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 open_mrs=$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
@@ -40,7 +41,7 @@ for i in $(seq 0 $((num_mrs - 1))); do
   mr_updated_at="$(echo "${mr}" | jq -r '.updated_at')"
   mr_sha="$(echo "${mr}" | jq -r '.sha')"
 
-  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ] && [ "${mr_sha}" -ne "${version_sha}" ]; then
+  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ] && [ "${mr_sha}" != "${version_sha}" ]; then
       mr_id="$(echo "${mr}" | jq -r '.id')"
 
       new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"mr_id\":\"${mr_id}\",\"sha\":\"${mr_sha}\"}"
