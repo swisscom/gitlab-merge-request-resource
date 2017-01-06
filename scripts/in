@@ -33,9 +33,10 @@ if [ -z "${version}" ]; then
 fi
 
 git clone "${uri}" "${destination}"
-git reset --hard "${commit_sha}"
 
 cd "${destination}"
+
+git reset --hard "${commit_sha}"
 
 jq -n "{
   version: ${version},
