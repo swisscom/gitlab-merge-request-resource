@@ -26,11 +26,11 @@ params="$(jq -r '.params // ""' < "${payload}")"
 path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
 new_status="$(echo "${params}" | jq -r '.status // ""')"
 
-if [ -z "${repository}" ]; then
+if [ -z "${path_to_repo}" ]; then
   echo "please specify a repository" >&2
   exit 1
 fi
-if [ -z "${status}" ]; then
+if [ -z "${new_status}" ]; then
   echo "please specify a status" >&2
   exit 1
 fi
