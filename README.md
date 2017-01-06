@@ -32,7 +32,7 @@ resources:
 
 ### `check`: Check for new merge requests
 
-Checks if there are new merge requests or merge requests with new commits
+Checks if there are new merge requests or merge requests with new commits.
 
 ### `in`: Clone merge request source branch
 
