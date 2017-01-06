@@ -10,7 +10,7 @@ source "$(dirname "$0")/common.sh"
 
 destination=$1
 
-if [ -z "$destination" ]; then
+if [ -z "${destination}" ]; then
   echo "usage: $0 <path/to/destination>" >&2
   exit 1
 fi
@@ -25,6 +25,15 @@ project_path=$(jq -r '.source.project_path // ""' < "${payload}")
 params=$(jq -r '.params // ""' < "${payload}")
 path_to_repo=$(echo "${params}" | jq -r '.repository // ""')
 new_status=$(echo "${params}" | jq -r '.status // ""')
+
+if [ -z "${repository}" ]; then
+  echo "please specify a repository" >&2
+  exit 1
+fi
+if [ -z "${status}" ]; then
+  echo "please specify a status" >&2
+  exit 1
+fi
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 

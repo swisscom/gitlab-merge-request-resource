@@ -10,7 +10,7 @@ source "$(dirname "$0")/common.sh"
 
 destination=$1
 
-if [ -z "$destination" ]; then
+if [ -z "${destination}" ]; then
   echo "usage: $0 <path/to/destination>" >&2
   exit 1
 fi
