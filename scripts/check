@@ -42,9 +42,7 @@ for i in $(seq 0 $((num_mrs - 1))); do
   mr_sha="$(echo "${mr}" | jq -r '.sha')"
 
   if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ] && [ "${mr_sha}" != "${version_sha}" ]; then
-      mr_id="$(echo "${mr}" | jq -r '.id')"
-
-      new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"mr_id\":\"${mr_id}\",\"sha\":\"${mr_sha}\"}"
+      new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"sha\":\"${mr_sha}\"}"
   fi
 done
 

@@ -20,20 +20,11 @@ payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
 cat > "${payload}" <&0
 
 gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
-private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
 project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
 username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
 version="$(jq -r '.version // ""' < "${payload}")"
-mr_id="$(echo "${version}" | jq -r '.mr_id // ""')"
-
-project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
-
-merge_request="$(curl \
---header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests/${mr_id}")"
-
-source_branch="$(echo "${merge_request}" | jq -r '.source_branch // ""')"
+commit_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
@@ -41,14 +32,8 @@ if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
 fi
 
-branch_flag=""
-if ! [ -z "${source_branch}" ]; then
-  branch_flag="--branch ${source_branch}"
-fi
-
-git clone --single-branch "${uri}" ${branch_flag} "${destination}"
-
-echo "${mr_id}" > "${destination}/merge-request-id"
+git clone "${uri}" "${destination}"
+git reset --hard "${commit_sha}"
 
 cd "${destination}"
 
