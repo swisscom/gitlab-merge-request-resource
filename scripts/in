@@ -19,21 +19,21 @@ payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
 
 cat > "${payload}" <&0
 
-gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
-private_token=$(jq -r '.source.private_token // ""' < "${payload}")
-project_path=$(jq -r '.source.project_path // ""' < "${payload}")
-username=$(jq -r '.source.username // ""' < "${payload}")
-password=$(jq -r '.source.password // ""' < "${payload}")
-version=$(jq -r '.version // ""' < "${payload}")
-mr_id=$(echo "${version}" | jq -r '.mr_id // ""')
+gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
+private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
+project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
+username="$(jq -r '.source.username // ""' < "${payload}")"
+password="$(jq -r '.source.password // ""' < "${payload}")"
+version="$(jq -r '.version // ""' < "${payload}")"
+mr_id="$(echo "${version}" | jq -r '.mr_id // ""')"
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
-merge_request=$(curl \
+merge_request="$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests/${mr_id}")
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests/${mr_id}")"
 
-source_branch="$(echo ${merge_request} | jq -r '.source_branch // ""')"
+source_branch="$(echo "${merge_request}" | jq -r '.source_branch // ""')"
 
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 

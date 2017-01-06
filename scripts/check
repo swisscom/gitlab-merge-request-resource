@@ -6,27 +6,27 @@ set -e
 exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
-payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
+payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
 
-gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
-private_token=$(jq -r '.source.private_token // ""' < "${payload}")
-project_path=$(jq -r '.source.project_path // ""' < "${payload}")
-version=$(jq -r '.version // ""' < "${payload}")
+gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
+private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
+project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
+version="$(jq -r '.version // ""' < "${payload}")"
 
 if [ -z "${version}" ]; then
   version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
 fi
 
-version_updated_at=$(echo "${version}" | jq -r '.updated_at // ""')
-version_sha=$(echo "${version}" | jq -r '.sha // ""')
+version_updated_at="$(echo "${version}" | jq -r '.updated_at // ""')"
+version_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
-open_mrs=$(curl \
+open_mrs="$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened")
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened")"
 
 num_mrs="$(echo "${open_mrs}" | jq 'length')"
 
@@ -48,7 +48,7 @@ for i in $(seq 0 $((num_mrs - 1))); do
   fi
 done
 
-new_versions=${new_versions#','} # remove trailing comma
+new_versions="${new_versions#','}" # remove trailing comma
 new_versions="[${new_versions}]" # make JSON array
 
 if [ "${new_versions}" == '[]' ]; then

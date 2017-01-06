@@ -15,16 +15,16 @@ if [ -z "${destination}" ]; then
   exit 1
 fi
 
-payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
+payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
 
-gitlab_host=$(jq -r '.source.gitlab_host // ""' < "${payload}")
-private_token=$(jq -r '.source.private_token // ""' < "${payload}")
-project_path=$(jq -r '.source.project_path // ""' < "${payload}")
-params=$(jq -r '.params // ""' < "${payload}")
-path_to_repo=$(echo "${params}" | jq -r '.repository // ""')
-new_status=$(echo "${params}" | jq -r '.status // ""')
+gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
+private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
+project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
+params="$(jq -r '.params // ""' < "${payload}")"
+path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
+new_status="$(echo "${params}" | jq -r '.status // ""')"
 
 if [ -z "${repository}" ]; then
   echo "please specify a repository" >&2
