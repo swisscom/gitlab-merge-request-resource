@@ -28,21 +28,21 @@ new_status=$(echo "${params}" | jq -r '.status // ""')
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
-if [ -z "${version}" ]; then
-  version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
-fi
-
 target_url="${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}"
 
 cd "${destination}"
 cd "${path_to_repo}"
+
+mr_sha="$(git rev-parse HEAD)"
 
 curl \
 --request POST \
 --header "PRIVATE-TOKEN: ${private_token}" \
 --header "Content-Type: application/json" \
 --data-urlencode "{\"state\":\"${new_status}\",\"name\":\"concourse\",\"target_url\":\"${target_url}\"}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/$(git rev-parse HEAD)"
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${mr_sha}"
+
+version="{\"sha\":\"${mr_sha}\"}"
 
 jq -n "{
   version: ${version},
