@@ -43,6 +43,7 @@ cd "${destination}"
 cd "${path_to_repo}"
 
 commit_sha="$(git rev-parse HEAD)"
+updated_at="$(git show -s --format=%ci ${commit_sha})"
 
 curl \
 --request POST \
@@ -51,7 +52,7 @@ curl \
 --data "{\"state\":\"${new_status}\",\"name\":\"concourse\",\"target_url\":\"${target_url}\"}" \
 "https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
 
-version="{\"sha\":\"${commit_sha}\"}"
+version="{\"updated_at\":\"${updated_at}\",\"sha\":\"${commit_sha}\"}"
 
 jq -n "{
   version: ${version},
