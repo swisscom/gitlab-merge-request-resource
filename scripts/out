@@ -42,16 +42,16 @@ target_url="${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPEL
 cd "${destination}"
 cd "${path_to_repo}"
 
-mr_sha="$(git rev-parse HEAD)"
+commit_sha="$(git rev-parse HEAD)"
 
 curl \
 --request POST \
 --header "PRIVATE-TOKEN: ${private_token}" \
 --header "Content-Type: application/json" \
 --data-urlencode "{\"state\":\"${new_status}\",\"name\":\"concourse\",\"target_url\":\"${target_url}\"}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${mr_sha}"
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
 
-version="{\"sha\":\"${mr_sha}\"}"
+version="{\"sha\":\"${commit_sha}\"}"
 
 jq -n "{
   version: ${version},
