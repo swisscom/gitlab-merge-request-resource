@@ -44,7 +44,7 @@ for i in $(seq 0 $((num_mrs - 1))); do
   mr_sha="$(echo "${mr}" | jq -r '.sha')"
   mr_updated_at="$(git show -s --format=%ct ${mr_sha})"
 
-  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ]; then
+  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ] || [ -z "${version_sha}" ]; then
       new_versions="${new_versions},{\"sha\":\"${mr_sha}\"}"
   fi
 done
