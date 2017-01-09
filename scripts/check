@@ -29,7 +29,7 @@ project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 open_mrs="$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened")"
+"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened&order_by=updated_at&sort=desc")"
 
 num_mrs="$(echo "${open_mrs}" | jq 'length')"
 
