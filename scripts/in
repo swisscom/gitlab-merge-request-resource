@@ -28,10 +28,6 @@ commit_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
-if [ -z "${version}" ]; then
-  version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
-fi
-
 git clone "${uri}" "${destination}"
 
 cd "${destination}"

@@ -13,14 +13,17 @@ cat > "${payload}" <&0
 gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
 private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
 project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
-version="$(jq -r '.version // ""' < "${payload}")"
+username="$(jq -r '.source.username // ""' < "${payload}")"
+password="$(jq -r '.source.password // ""' < "${payload}")"
+version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
-if [ -z "${version}" ]; then
-  version='{"updated_at":"1800-01-01T00:00:00.000Z","sha":null}'
-fi
+uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
-version_updated_at="$(echo "${version}" | jq -r '.updated_at // ""')"
-version_sha="$(echo "${version}" | jq -r '.sha // ""')"
+[ -d /tmp/repo ] || git clone "${uri}" /tmp/repo
+cd /tmp/repo
+git pull
+
+version_updated_at="$(git show -s --format=%ct ${version_sha})"
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
@@ -31,26 +34,26 @@ open_mrs="$(curl \
 num_mrs="$(echo "${open_mrs}" | jq 'length')"
 
 function to_seconds {
-  date -d "$(echo "$1" | sed 's/.\{5\}$//' | tr T ' ')" +%s
+  date -d "$1" +%s
 }
 
 new_versions=''
 
 for i in $(seq 0 $((num_mrs - 1))); do
   mr="$(echo "${open_mrs}" | jq -r '.['"$i"']')"
-  mr_updated_at="$(echo "${mr}" | jq -r '.updated_at')"
   mr_sha="$(echo "${mr}" | jq -r '.sha')"
+  mr_updated_at="$(git show -s --format=%ct ${mr_sha})"
 
-  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ] && [ "${mr_sha}" != "${version_sha}" ]; then
-      new_versions="${new_versions},{\"updated_at\":\"${mr_updated_at}\",\"sha\":\"${mr_sha}\"}"
+  if [ "$(to_seconds "${mr_updated_at}")" -gt "$(to_seconds "${version_updated_at}")" ]; then
+      new_versions="${new_versions},{\"sha\":\"${mr_sha}\"}"
   fi
 done
 
 new_versions="${new_versions#','}" # remove trailing comma
 new_versions="[${new_versions}]" # make JSON array
 
-if [ "${new_versions}" == '[]' ]; then
-  new_versions="[${version}]"
+if [ "${new_versions}" == '[]' ] && ! [ -z "${version_sha}" ]; then
+  new_versions="[{\"sha\":\"${version_sha}\"}]"
 fi
 
 jq -n "${new_versions}" >&3
