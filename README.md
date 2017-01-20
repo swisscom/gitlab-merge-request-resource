@@ -1,4 +1,4 @@
-# GitLab Merge Reuqest Concourse Resource
+# GitLab Merge Request Concourse Resource
 
 A concourse resource to check for new merge requests on GitLab and update the merge request status.
 
