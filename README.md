@@ -56,19 +56,19 @@ jobs:
   - get: repo
     resource: repo-mr
     trigger: true
-  - put: merge-request
+  - put: repo-mr
     params:
       repository: repo
       status: running
   - task: run-tests
-    file: merge-requests/ci/tasks/run-tests.yml
+    file: repo/ci/tasks/run-tests.yml
   on_failure:
-    put: merge-request
+    put: repo-mr
     params:
       repository: repo
       status: failed
   on_success:
-    put: merge-request
+    put: repo-mr
     params:
       repository: repo
       status: success
