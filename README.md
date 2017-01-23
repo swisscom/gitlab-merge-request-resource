@@ -12,10 +12,10 @@ resource_types:
     repository: mastertinner/gitlab-merge-request-resource
 
 resources:
-- name: my-repo-mr
+- name: repo-mr
   type: merge-request
   source:
-    gitlab_host: gitlab.swisscloud.io
+    gitlab_host: gitlab.com
     project_path: myname/myproject
     private_token: XXX
     username: my_username
@@ -47,10 +47,29 @@ Updates the merge request's `merge_status` which displays nicely in the GitLab U
 * `repository`: The path of the repository of the merge request's source branch
 * `status`: The new status of the merge request (`pending`, `running`, `success`, `failed`, or `canceled`)
 
-## Find Docker Image
+## Example
 
-Check <https://store.docker.com/community/images/mastertinner/gitlab-merge-request-resource>
-
-## Build Docker Image
-
-1. Run `docker build -t gitlab-merge-request-resource .`
+```yaml
+jobs:
+- name: test-merge-request
+  plan:
+  - get: repo
+    resource: repo-mr
+    trigger: true
+  - put: merge-request
+    params:
+      repository: repo
+      status: running
+  - task: run-tests
+    file: merge-requests/ci/tasks/run-tests.yml
+  on_failure:
+    put: merge-request
+    params:
+      repository: repo
+      status: failed
+  on_success:
+    put: merge-request
+    params:
+      repository: repo
+      status: success
+```
