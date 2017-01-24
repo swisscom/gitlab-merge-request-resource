@@ -23,7 +23,7 @@ uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 cd /tmp/repo
 git pull
 
-version_updated_at="$(git show -s --format=%ct ${version_sha})"
+version_updated_at="$(git show -s --format=%ct "${version_sha}")"
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
@@ -38,7 +38,7 @@ new_versions=''
 for i in $(seq 0 $((num_mrs - 1))); do
   mr="$(echo "${open_mrs}" | jq -r '.['"$i"']')"
   mr_sha="$(echo "${mr}" | jq -r '.sha')"
-  mr_updated_at="$(git show -s --format=%ct ${mr_sha})"
+  mr_updated_at="$(git show -s --format=%ct "${mr_sha}")"
 
   if [ "${mr_updated_at}" -gt "${version_updated_at}" ] || [ -z "${version_sha}" ]; then
       new_versions="${new_versions},{\"sha\":\"${mr_sha}\"}"
