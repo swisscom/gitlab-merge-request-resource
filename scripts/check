@@ -6,6 +6,8 @@ set -e -u
 exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
+TMPDIR=${TMPDIR:-/tmp}
+
 payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
