@@ -19,13 +19,16 @@ username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
 version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
+version_updated_at=0
+if [ ! -z "${version_sha}" ]; then
+  version_updated_at="$(git show -s --format=%ct "${version_sha}")"
+fi
+
 uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
 
 [ -d /tmp/repo ] || git clone "${uri}" /tmp/repo
 cd /tmp/repo
 git pull
-
-version_updated_at="$(git show -s --format=%ct "${version_sha}")"
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
