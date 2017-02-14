@@ -25,6 +25,17 @@ resources:
 * `gitlab_host` is the host of your GitLab server (without the `https://`)
 * `project_path` is the path of your project
 * `private_token` is your GitLab user's private token (can be found in your profile)
+* `private_key` is the private SSH key for SSH auth when pulling
+
+    Example:
+    ```yaml
+    private_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEowIBAAKCAQEAtCS10/f7W7lkQaSgD/mVeaSOvSF9ql4hf/zfMwfVGgHWjj+W
+      <Lots more text>
+      DWiJL+OFeg9kawcUL6hQ8JeXPhlImG6RTUffma9+iGQyyBMCGd1l
+      -----END RSA PRIVATE KEY-----
+    ```
 * `username` is the username for HTTP(S) auth when pulling
 * `password` is the password for HTTP(S) auth when pulling
 

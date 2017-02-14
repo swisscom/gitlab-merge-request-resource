@@ -25,10 +25,20 @@ gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
 project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
 username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
+private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
 version="$(jq -r '.version // ""' < "${payload}")"
 commit_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
-uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
+if [[ ! -z $private_key ]]; then
+  mkdir -p ~/.ssh/
+  id_rsa=~/.ssh/id_rsa
+  echo "$private_key" > "$id_rsa"
+  chmod 500 ~/.ssh/id_rsa
+  ssh-keyscan -t rsa ${gitlab_host} > ~/.ssh/known_hosts
+  uri="git@${gitlab_host}:${project_path}.git"
+else
+  uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
+fi
 
 git clone "${uri}" "${destination}"
 
