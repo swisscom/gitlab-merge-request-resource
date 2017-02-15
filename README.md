@@ -28,6 +28,7 @@ resources:
 * `private_key` is the private SSH key for SSH auth when pulling
 
     Example:
+
     ```yaml
     private_key: |
       -----BEGIN RSA PRIVATE KEY-----
@@ -36,6 +37,7 @@ resources:
       DWiJL+OFeg9kawcUL6hQ8JeXPhlImG6RTUffma9+iGQyyBMCGd1l
       -----END RSA PRIVATE KEY-----
     ```
+
 * `username` is the username for HTTP(S) auth when pulling
 * `password` is the password for HTTP(S) auth when pulling
 
