@@ -33,9 +33,9 @@ if [[ ! -z "${private_key}" ]]; then
   chmod 500 "${id_rsa}"
   ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
 else
-  gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\2/p')"
-  project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\3/p')"
-  protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\1/p')"
+  gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
+  project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\3/p')"
+  protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\1/p')"
 
   echo "default login ${username} password ${password}" > "${HOME}/.netrc" # Save credentials for git push below
 fi
