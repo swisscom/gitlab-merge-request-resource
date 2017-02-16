@@ -10,19 +10,18 @@ TMPDIR=${TMPDIR:-/tmp}
 
 source "$(dirname "$0")/common.sh"
 
-destination=$1
+destination="$1"
 
 if [ -z "${destination}" ]; then
-  echo "usage: $0 <path/to/destination>" >&2
+  echo "Usage: $0 <path/to/destination>" >&2
   exit 1
 fi
 
-payload=$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")
+payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
 
-gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
-project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
+uri="$(jq -r '.source.uri // ""' < "${payload}")"
 username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
 private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
@@ -30,14 +29,15 @@ version="$(jq -r '.version // ""' < "${payload}")"
 commit_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
 if [[ ! -z "${private_key}" ]]; then
-  mkdir -p "${HOME}/.ssh/"
+  gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
+
   id_rsa="${HOME}/.ssh/id_rsa"
+  mkdir -p "${HOME}/.ssh/"
   echo "${private_key}" > "${id_rsa}"
   chmod 500 "${id_rsa}"
   ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
-  uri="git@${gitlab_host}:${project_path}.git"
 else
-  uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
+  echo "default login ${username} password ${password}" > "${HOME}/.netrc" # Save credentials for git push below
 fi
 
 git clone "${uri}" "${destination}"

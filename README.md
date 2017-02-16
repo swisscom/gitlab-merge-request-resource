@@ -15,17 +15,15 @@ resources:
 - name: repo-mr
   type: merge-request
   source:
-    gitlab_host: gitlab.com
-    project_path: myname/myproject
+    uri: https://gitlab.com/myname/myproject.git
     private_token: XXX
     username: my_username
     password: xxx
 ```
 
-* `gitlab_host` is the host of your GitLab server (without the `https://`)
-* `project_path` is the path of your project
-* `private_token` is your GitLab user's private token (can be found in your profile)
-* `private_key` is the private SSH key for SSH auth when pulling
+* `uri`: The location of the repository (required)
+* `private_token`: Your GitLab user's private token (required, can be found in your profile settings)
+* `private_key`: The private SSH key for SSH auth when pulling
 
     Example:
 
@@ -38,8 +36,8 @@ resources:
       -----END RSA PRIVATE KEY-----
     ```
 
-* `username` is the username for HTTP(S) auth when pulling
-* `password` is the password for HTTP(S) auth when pulling
+* `username`: The username for HTTP(S) auth when pulling
+* `password`: The password for HTTP(S) auth when pulling
 
 > Please note that you have to provide either `private_key` or `username` and `password`.
 
@@ -59,8 +57,8 @@ Updates the merge request's `merge_status` which displays nicely in the GitLab U
 
 #### Parameters
 
-* `repository`: The path of the repository of the merge request's source branch
-* `status`: The new status of the merge request (`pending`, `running`, `success`, `failed`, or `canceled`)
+* `repository`: The path of the repository of the merge request's source branch (required)
+* `status`: The new status of the merge request (required, can be either `pending`, `running`, `success`, `failed`, or `canceled`)
 
 ## Example
 
