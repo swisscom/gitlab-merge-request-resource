@@ -17,9 +17,19 @@ private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
 project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
 username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
+private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
 version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
-uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
+if [[ ! -z "${private_key}" ]]; then
+  mkdir -p "${HOME}/.ssh/"
+  id_rsa="${HOME}/.ssh/id_rsa"
+  echo "${private_key}" > "${id_rsa}"
+  chmod 500 "${id_rsa}"
+  ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
+  uri="git@${gitlab_host}:${project_path}.git"
+else
+  uri="https://${username}:${password}@${gitlab_host}/${project_path}.git"
+fi
 
 [ -d /tmp/repo ] || git clone "${uri}" /tmp/repo
 cd /tmp/repo
