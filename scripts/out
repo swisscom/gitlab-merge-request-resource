@@ -23,6 +23,7 @@ cat > "${payload}" <&0
 
 uri="$(jq -r '.source.uri // ""' < "${payload}")"
 private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
+no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 params="$(jq -r '.params // ""' < "${payload}")"
 path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
 new_status="$(echo "${params}" | jq -r '.status // ""')"
@@ -38,12 +39,17 @@ fi
 
 gitlab_host=''
 project_path=''
+protocol='https'
 if [[ ! -z "${private_key}" ]]; then
   gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
   project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
 else
-  gitlab_host="$(echo "${uri}" | sed -rn 's/https?:\/\/(.*)\/(.*)\.git/\1/p')"
-  project_path="$(echo "${uri}" | sed -rn 's/https?:\/\/(.*)\/(.*)\.git/\2/p')"
+  gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\2/p')"
+  project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\3/p')"
+  protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\1/p')"
+fi
+if [ "${no_ssl}" == 'true' ]; then
+  protocol='http'
 fi
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
@@ -60,7 +66,7 @@ curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
 --header "Content-Type: application/json" \
 --data "{\"state\":\"${new_status}\",\"name\":\"Concourse\",\"target_url\":\"${target_url}\"}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
+"${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
 
 version="{\"sha\":\"${commit_sha}\"}"
 

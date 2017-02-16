@@ -17,10 +17,12 @@ private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
 username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
 private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
+no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
 gitlab_host=''
 project_path=''
+protocol='https'
 if [[ ! -z "${private_key}" ]]; then
   gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
   project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
@@ -31,10 +33,14 @@ if [[ ! -z "${private_key}" ]]; then
   chmod 500 "${id_rsa}"
   ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
 else
-  gitlab_host="$(echo "${uri}" | sed -rn 's/https?:\/\/(.*)\/(.*)\.git/\1/p')"
-  project_path="$(echo "${uri}" | sed -rn 's/https?:\/\/(.*)\/(.*)\.git/\2/p')"
+  gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\2/p')"
+  project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\3/p')"
+  protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/(.*)\/(.*)\.git/\1/p')"
 
   echo "default login ${username} password ${password}" > "${HOME}/.netrc" # Save credentials for git push below
+fi
+if [ "${no_ssl}" == 'true' ]; then
+  protocol='http'
 fi
 
 [ -d /tmp/repo ] || git clone "${uri}" /tmp/repo
@@ -50,7 +56,7 @@ project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
 open_mrs="$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened&order_by=updated_at")"
+"${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened&order_by=updated_at")"
 
 num_mrs="$(echo "${open_mrs}" | jq 'length')"
 
