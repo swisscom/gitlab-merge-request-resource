@@ -41,7 +41,7 @@ resources:
 * `username` is the username for HTTP(S) auth when pulling
 * `password` is the password for HTTP(S) auth when pulling
 
-> Please not that you have to provide either `private_key` or `username` and `password`.
+> Please note that you have to provide either `private_key` or `username` and `password`.
 
 ## Behavior
 
