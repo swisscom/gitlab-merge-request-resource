@@ -10,10 +10,10 @@ TMPDIR=${TMPDIR:-/tmp}
 
 source "$(dirname "$0")/common.sh"
 
-destination=$1
+destination="$1"
 
 if [ -z "${destination}" ]; then
-  echo "usage: $0 <path/to/destination>" >&2
+  echo "Usage: $0 <path/to/destination>" >&2
   exit 1
 fi
 
@@ -21,9 +21,9 @@ payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
 
-gitlab_host="$(jq -r '.source.gitlab_host // ""' < "${payload}")"
+uri="$(jq -r '.source.uri // ""' < "${payload}")"
 private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
-project_path="$(jq -r '.source.project_path // ""' < "${payload}")"
+no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 params="$(jq -r '.params // ""' < "${payload}")"
 path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
 new_status="$(echo "${params}" | jq -r '.status // ""')"
@@ -35,6 +35,21 @@ fi
 if [ -z "${new_status}" ]; then
   echo "please specify a status" >&2
   exit 1
+fi
+
+gitlab_host=''
+project_path=''
+protocol='https'
+if [[ ! -z "${private_key}" ]]; then
+  gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
+  project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
+else
+  gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
+  project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\3/p')"
+  protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
+fi
+if [ "${no_ssl}" == 'true' ]; then
+  protocol='http'
 fi
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
@@ -51,7 +66,7 @@ curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
 --header "Content-Type: application/json" \
 --data "{\"state\":\"${new_status}\",\"name\":\"Concourse\",\"target_url\":\"${target_url}\"}" \
-"https://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
+"${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
 
 version="{\"sha\":\"${commit_sha}\"}"
 
