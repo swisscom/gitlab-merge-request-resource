@@ -23,6 +23,7 @@ cat > "${payload}" <&0
 
 uri="$(jq -r '.source.uri // ""' < "${payload}")"
 private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
+private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
 no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 params="$(jq -r '.params // ""' < "${payload}")"
 path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
