@@ -7,6 +7,8 @@ exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
 TMPDIR=${TMPDIR:-/tmp}
+CURL_OPTION=""
+GIT_OPTION=""
 
 payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
@@ -18,6 +20,7 @@ username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
 private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
 no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
+insecure="$(jq -r '.source.insecure // "false"' < "${payload}")"
 version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
 gitlab_host=''
@@ -42,10 +45,14 @@ fi
 if [ "${no_ssl}" == 'true' ]; then
   protocol='http'
 fi
+if [ "$insecure" == "true" ]; then
+  CURL_OPTION="${CURL_OPTION} -k"
+  GIT_OPTION="${GIT_OPTION} -c http.sslVerify=false"
+fi
 
-[ -d /tmp/repo ] || git clone "${uri}" /tmp/repo
+[ -d /tmp/repo ] || git clone ${GIT_OPTION} "${uri}" /tmp/repo
 cd /tmp/repo
-git pull
+git ${GIT_OPTION} pull
 
 version_updated_at=0
 if [ ! -z "${version_sha}" ]; then
@@ -54,7 +61,7 @@ fi
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
 
-open_mrs="$(curl \
+open_mrs="$(curl ${CURL_OPTION} \
 --header "PRIVATE-TOKEN: ${private_token}" \
 "${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened&order_by=updated_at")"
 
