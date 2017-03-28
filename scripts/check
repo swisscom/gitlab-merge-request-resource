@@ -8,6 +8,8 @@ exec 1>&2 # redirect all output to stderr for logging
 
 TMPDIR=${TMPDIR:-/tmp}
 
+source "$(dirname "$0")/common.sh"
+
 payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
