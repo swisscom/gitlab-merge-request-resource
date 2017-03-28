@@ -21,6 +21,8 @@ payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
 
 cat > "${payload}" <&0
 
+configure_ssl_verification "${payload}"
+
 uri="$(jq -r '.source.uri // ""' < "${payload}")"
 username="$(jq -r '.source.username // ""' < "${payload}")"
 password="$(jq -r '.source.password // ""' < "${payload}")"
