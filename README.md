@@ -39,7 +39,7 @@ resources:
 * `username`: The username for HTTP(S) auth when pulling
 * `password`: The password for HTTP(S) auth when pulling
 * `no_ssl`: Set to `true` if the GitLab API should be used over HTTP instead of HTTPS
-* `insecure`: Optional. Connect to GitLab insecurely - i.e. skip SSL validation. Defaults to false if not provided.
+* `skip_ssl_verification`: Optional. Connect to GitLab insecurely - i.e. skip SSL validation. Defaults to false if not provided.
 
 > Please note that you have to provide either `private_key` or `username` and `password`.
 
