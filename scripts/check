@@ -57,6 +57,7 @@ if [ ! -z "${version_sha}" ]; then
 fi
 
 project_path_encoded="${project_path//'/'/'%2F'}" # url encode "/"
+project_path_encoded="${project_path//'.'/'%2E'}" # url encode "."
 
 open_mrs="$(curl \
 --header "PRIVATE-TOKEN: ${private_token}" \
