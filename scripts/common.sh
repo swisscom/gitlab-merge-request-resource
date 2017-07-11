@@ -78,3 +78,7 @@ configure_ssl_verification() {
       echo insecure > $HOME/.curlrc
     fi
 }
+
+urlencode() {
+  echo -n "${1}" | jq -s -R -r @uri
+}

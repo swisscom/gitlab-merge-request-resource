@@ -58,7 +58,7 @@ fi
 project_path_encoded="${project_path//\//%2F}" # url encode "/"
 project_path_encoded="${project_path_encoded//./%2E}" # url encode "."
 
-target_url="${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}"
+target_url="${ATC_EXTERNAL_URL}/teams/$(urlencode ${BUILD_TEAM_NAME})/pipelines/$(urlencode ${BUILD_PIPELINE_NAME})/jobs/$(urlencode ${BUILD_JOB_NAME})/builds/$(urlencode ${BUILD_NAME})"
 
 cd "${destination}"
 cd "${path_to_repo}"
