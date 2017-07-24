@@ -65,7 +65,7 @@ commit_sha="$(git rev-parse HEAD)"
 curl \
     --request POST \
     --header "PRIVATE-TOKEN: ${private_token}" \
-    --header "Content-Type: application/json" \
+    --header 'Content-Type: application/json' \
     --data "{\"state\":\"${new_status}\",\"name\":\"Concourse\",\"target_url\":\"${target_url}\"}" \
     "${protocol}://${gitlab_host}/api/v3/projects/$(urlencode "${project_path}")/statuses/${commit_sha}"
 
