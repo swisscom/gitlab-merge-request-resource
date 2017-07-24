@@ -13,8 +13,8 @@ source "$(dirname "$0")/common.sh"
 destination="$1"
 
 if [ -z "${destination}" ]; then
-  echo "Usage: $0 <path/to/destination>" >&2
-  exit 1
+    echo "Usage: $0 <path/to/destination>" >&2
+    exit 1
 fi
 
 payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
@@ -32,33 +32,30 @@ path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
 new_status="$(echo "${params}" | jq -r '.status // ""')"
 
 if [ -z "${path_to_repo}" ]; then
-  echo "please specify a repository" >&2
-  exit 1
+    echo "please specify a repository" >&2
+    exit 1
 fi
 if [ -z "${new_status}" ]; then
-  echo "please specify a status" >&2
-  exit 1
+    echo "please specify a status" >&2
+    exit 1
 fi
 
 gitlab_host=''
 project_path=''
 protocol='https'
 if [[ ! -z "${private_key}" ]]; then
-  gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
-  project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
+    gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
+    project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
 else
-  gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
-  project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\3/p')"
-  protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\1/p')"
+    gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
+    project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\3/p')"
+    protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\1/p')"
 fi
 if [ "${no_ssl}" == 'true' ]; then
-  protocol='http'
+    protocol='http'
 fi
 
-project_path_encoded="${project_path//\//%2F}" # url encode "/"
-project_path_encoded="${project_path_encoded//./%2E}" # url encode "."
-
-target_url="${ATC_EXTERNAL_URL}/teams/$(urlencode ${BUILD_TEAM_NAME})/pipelines/$(urlencode ${BUILD_PIPELINE_NAME})/jobs/$(urlencode ${BUILD_JOB_NAME})/builds/$(urlencode ${BUILD_NAME})"
+target_url="${ATC_EXTERNAL_URL}/teams/$(urlencode "${BUILD_TEAM_NAME}")/pipelines/$(urlencode "${BUILD_PIPELINE_NAME}")/jobs/$(urlencode "${BUILD_JOB_NAME}")/builds/$(urlencode "${BUILD_NAME}")"
 
 cd "${destination}"
 cd "${path_to_repo}"
@@ -66,15 +63,15 @@ cd "${path_to_repo}"
 commit_sha="$(git rev-parse HEAD)"
 
 curl \
---request POST \
---header "PRIVATE-TOKEN: ${private_token}" \
---header "Content-Type: application/json" \
---data "{\"state\":\"${new_status}\",\"name\":\"Concourse\",\"target_url\":\"${target_url}\"}" \
-"${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/statuses/${commit_sha}"
+    --request POST \
+    --header "PRIVATE-TOKEN: ${private_token}" \
+    --header "Content-Type: application/json" \
+    --data "{\"state\":\"${new_status}\",\"name\":\"Concourse\",\"target_url\":\"${target_url}\"}" \
+    "${protocol}://${gitlab_host}/api/v3/projects/$(urlencode "${project_path}")/statuses/${commit_sha}"
 
 version="{\"sha\":\"${commit_sha}\"}"
 
 jq -n "{
-  version: ${version},
-  metadata: $(git_metadata)
+    version: ${version},
+    metadata: $(git_metadata)
 }" >&3

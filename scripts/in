@@ -13,8 +13,8 @@ source "$(dirname "$0")/common.sh"
 destination="$1"
 
 if [ -z "${destination}" ]; then
-  echo "Usage: $0 <path/to/destination>" >&2
-  exit 1
+    echo "Usage: $0 <path/to/destination>" >&2
+    exit 1
 fi
 
 payload="$(mktemp "${TMPDIR}/gitlab-merge-request-resource.XXXXXX")"
@@ -31,15 +31,15 @@ version="$(jq -r '.version // ""' < "${payload}")"
 commit_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
 if [[ ! -z "${private_key}" ]]; then
-  gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
+    gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
 
-  id_rsa="${HOME}/.ssh/id_rsa"
-  mkdir -p "${HOME}/.ssh/"
-  echo "${private_key}" > "${id_rsa}"
-  chmod 500 "${id_rsa}"
-  ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
+    id_rsa="${HOME}/.ssh/id_rsa"
+    mkdir -p "${HOME}/.ssh/"
+    echo "${private_key}" > "${id_rsa}"
+    chmod 500 "${id_rsa}"
+    ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
 else
-  echo "default login ${username} password ${password}" > "${HOME}/.netrc" # Save credentials for git push below
+    echo "default login ${username} password ${password}" > "${HOME}/.netrc" # Save credentials for git push below
 fi
 
 git clone "${uri}" "${destination}"
@@ -49,6 +49,6 @@ cd "${destination}"
 git reset --hard "${commit_sha}"
 
 jq -n "{
-  version: ${version},
-  metadata: $(git_metadata)
+    version: ${version},
+    metadata: $(git_metadata)
 }" >&3

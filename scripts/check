@@ -23,42 +23,40 @@ version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
 gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
 project_path="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\3/p')"
-project_path_encoded="${project_path//\//%2F}" # url encode "/"
-project_path_encoded="${project_path_encoded//./%2E}" # url encode "."
 protocol="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\1/p')"
 
 if [ "${no_ssl}" == 'true' ]; then
-  protocol='http'
+    protocol='http'
 fi
 
 version_updated_at=0
 if [ ! -z "${version_sha}" ]; then
-  version_updated_at=`curl -s -H "private-token: ${private_token}" "${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/repository/commits/${version_sha}" \
-    | jq '.committed_date|.[:19]|strptime("%Y-%m-%dT%H:%M:%S")|mktime'`
+    version_updated_at="$(curl -s -H \"private-token: "${private_token}"\" "${protocol}://${gitlab_host}/api/v3/projects/$(urlencode "${project_path}")/repository/commits/${version_sha}" \
+        | jq '.committed_date|.[:19]|strptime("%Y-%m-%dT%H:%M:%S")|mktime')"
 fi
 
-open_mrs="$(curl -s -H "private-token: ${private_token}" "${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/merge_requests?state=opened&order_by=updated_at")"
+open_mrs="$(curl -s -H \"private-token: "${private_token}"\" "${protocol}://${gitlab_host}/api/v3/projects/$(urlencode "${project_path}")/merge_requests?state=opened&order_by=updated_at")"
 num_mrs="$(echo "${open_mrs}" | jq 'length')"
 
 new_versions=''
 
 for i in $(seq 0 $((num_mrs - 1))); do
-  mr="$(echo "${open_mrs}" | jq -r '.['"$i"']')"
-  mr_sha="$(echo "${mr}" | jq -r '.sha')"
-  if [ "${mr_sha}" != "null" ]; then
-    mr_updated_at=`curl -s -H "private-token: ${private_token}" "${protocol}://${gitlab_host}/api/v3/projects/${project_path_encoded}/repository/commits/${mr_sha}" \
-      | jq '.committed_date|.[:19]|strptime("%Y-%m-%dT%H:%M:%S")|mktime'`
-    if [ "${mr_updated_at}" -gt "${version_updated_at}" ] || [ -z "${version_sha}" ]; then
-        new_versions="${new_versions},{\"sha\":\"${mr_sha}\"}"
+    mr="$(echo "${open_mrs}" | jq -r '.['"$i"']')"
+    mr_sha="$(echo "${mr}" | jq -r '.sha')"
+    if [ "${mr_sha}" != "null" ]; then
+        mr_updated_at="$(curl -s -H \"private-token: "${private_token}"\" "${protocol}://${gitlab_host}/api/v3/projects/$(urlencode "${project_path}")/repository/commits/${mr_sha}" \
+            | jq '.committed_date|.[:19]|strptime("%Y-%m-%dT%H:%M:%S")|mktime')"
+        if [ "${mr_updated_at}" -gt "${version_updated_at}" ] || [ -z "${version_sha}" ]; then
+            new_versions="${new_versions},{\"sha\":\"${mr_sha}\"}"
+        fi
     fi
-  fi
 done
 
 new_versions="${new_versions#','}" # remove trailing comma
 new_versions="[${new_versions}]" # make JSON array
 
 if [ "${new_versions}" == '[]' ] && ! [ -z "${version_sha}" ]; then
-  new_versions="[{\"sha\":\"${version_sha}\"}]"
+    new_versions="[{\"sha\":\"${version_sha}\"}]"
 fi
 
 jq -n "${new_versions}" >&3
