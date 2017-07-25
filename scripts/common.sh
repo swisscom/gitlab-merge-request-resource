@@ -80,5 +80,5 @@ configure_ssl_verification() {
 }
 
 urlencode() {
-  echo "$1" | jq -s -R -r @uri
+  echo -n "$1" | jq -s -R -r @uri
 }
