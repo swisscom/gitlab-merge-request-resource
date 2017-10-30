@@ -2,6 +2,7 @@
 # vim: set ft=sh
 
 set -e -u
+
 exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
@@ -17,11 +18,10 @@ configure_ssl_verification "${payload}"
 
 uri="$(jq -r '.source.uri // ""' < "${payload}")"
 private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
-private_key="$(jq -r '.source.private_key // ""' < "${payload}")"
 no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
-if [[ ! -z "${private_key}" ]]; then
+if [[ "${uri}" == "git@"* ]]; then
   gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
   project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
   protocol='https'
