@@ -30,6 +30,7 @@ no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 params="$(jq -r '.params // ""' < "${payload}")"
 path_to_repo="$(echo "${params}" | jq -r '.repository // ""')"
 new_status="$(echo "${params}" | jq -r '.status // ""')"
+task_name="$(echo "${params}" | jq -r '.name // "Concourse"')"
 
 if [ -z "${path_to_repo}" ]; then
     echo "please specify a repository" >&2
@@ -68,7 +69,7 @@ curl \
     --request POST \
     --header "PRIVATE-TOKEN: ${private_token}" \
     --header 'Content-Type: application/json' \
-    --data "{\"state\":\"${new_status}\",\"name\":\"Concourse\",\"target_url\":\"${target_url}\"}" \
+    --data "{\"state\":\"${new_status}\",\"name\":\"${task_name}\",\"target_url\":\"${target_url}\"}" \
     "${protocol}://${gitlab_host}/api/v3/projects/$(urlencode "${project_path}")/statuses/${commit_sha}"
 
 version="{\"sha\":\"${commit_sha}\"}"
