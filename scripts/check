@@ -21,9 +21,11 @@ private_token="$(jq -r '.source.private_token // ""' < "${payload}")"
 no_ssl="$(jq -r '.source.no_ssl // ""' < "${payload}")"
 version_sha="$(jq -r '.version.sha // ""' < "${payload}")"
 
-if [[ "${uri}" == "git@"* ]]; then
-  gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
-  project_path="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\2/p')"
+if [[ "${uri}" == *"git@"* ]]; then
+  gitlab_host="$(echo "${uri}" | sed -rn 's/.*git@(.*):([0-9]*\/+)?(.*)\.git/\1/p')"
+  port="$(echo "${uri}" | sed -rn 's/.*git@(.*):([0-9]*\/+)?(.*)\.git/\2/p')"
+  port=${port///} # remove trailing slash
+  project_path="$(echo "${uri}" | sed -rn 's/.*git@(.*):([0-9]*\/+)?(.*)\.git/\3/p')"
   protocol='https'
 else
   gitlab_host="$(echo "${uri}" | sed -rn 's/(https?):\/\/([^\/]*)\/(.*)\.git/\2/p')"
