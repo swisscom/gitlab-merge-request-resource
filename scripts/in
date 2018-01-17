@@ -31,13 +31,20 @@ version="$(jq -r '.version // ""' < "${payload}")"
 commit_sha="$(echo "${version}" | jq -r '.sha // ""')"
 
 if [[ ! -z "${private_key}" ]]; then
-    gitlab_host="$(echo "${uri}" | sed -rn 's/git@(.*):(.*)\.git/\1/p')"
+    gitlab_host="$(echo "${uri}" | sed -rn 's/.*git@(.*):([0-9]*\/+)?(.*)\.git/\1/p')"
+    port="$(echo "${uri}" | sed -rn 's/.*git@(.*):([0-9]*\/+)?(.*)\.git/\2/p')"
+    port=${port///} # remove trailing slash
 
     id_rsa="${HOME}/.ssh/id_rsa"
     mkdir -p "${HOME}/.ssh/"
     echo "${private_key}" > "${id_rsa}"
     chmod 500 "${id_rsa}"
-    ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
+
+    if [[ ! -z "${port}" ]]; then
+        ssh-keyscan -t rsa -p "${port}" "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
+    else
+        ssh-keyscan -t rsa "${gitlab_host}" > "${HOME}/.ssh/known_hosts"
+    fi
 else
     echo "default login ${username} password ${password}" > "${HOME}/.netrc" # Save credentials for git push below
 fi
