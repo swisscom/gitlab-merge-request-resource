@@ -25,16 +25,16 @@ resources:
 * `private_token`: Your GitLab user's private token (required, can be found in your profile settings)
 * `private_key`: The private SSH key for SSH auth when pulling
 
-    Example:
+  Example:
 
-    ```yaml
-    private_key: |
-      -----BEGIN RSA PRIVATE KEY-----
-      MIIEowIBAAKCAQEAtCS10/f7W7lkQaSgD/mVeaSOvSF9ql4hf/zfMwfVGgHWjj+W
-      <Lots more text>
-      DWiJL+OFeg9kawcUL6hQ8JeXPhlImG6RTUffma9+iGQyyBMCGd1l
-      -----END RSA PRIVATE KEY-----
-    ```
+  ```yaml
+  private_key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEAtCS10/f7W7lkQaSgD/mVeaSOvSF9ql4hf/zfMwfVGgHWjj+W
+    <Lots more text>
+    DWiJL+OFeg9kawcUL6hQ8JeXPhlImG6RTUffma9+iGQyyBMCGd1l
+    -----END RSA PRIVATE KEY-----
+  ```
 
 * `username`: The username for HTTP(S) auth when pulling
 * `password`: The password for HTTP(S) auth when pulling
@@ -61,6 +61,7 @@ Updates the merge request's `merge_status` which displays nicely in the GitLab U
 
 * `repository`: The path of the repository of the merge request's source branch (required)
 * `status`: The new status of the merge request (required, can be either `pending`, `running`, `success`, `failed`, or `canceled`)
+* `build_label`: The label of the build in GitLab (optional, defaults to `"Concourse"`)
 
 ## Example
 
